@@ -8,9 +8,12 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import authRoutes from './routes/authRoutes.js';
+import usersRoutes from './routes/usersRoutes.js';
+import postRoutes from './routes/postRoutes.js';
 import { registerUser } from './controllers/auth.js';
-import authRoutes from './routes/authRoutes.js'
-import usersRoutes from './routes/usersRoutes.js'
+import { createPost } from './controllers/posts.js';
+import { verifyToken } from './middlewares/auth.js';
 
 /** CONFIGURATIONS */
 
@@ -50,20 +53,26 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
-const upload = multer({storage})
+const upload = multer({ storage });
 
 /**routes */
-app.post('/auth/register', upload.single('picture'), registerUser)
+app.post('/auth/register', upload.single('picture'), registerUser);
+app.use('/posts', verifyToken, upload.single('picture'), createPost);
 
 /**ROUTES */
-app.use('/auth', authRoutes)
-app.use('/users', usersRoutes)
+app.use('/auth', authRoutes);
+app.use('/users', usersRoutes);
+app.use('/posts', postRoutes);
 
 /** MONGOOSE CONFIGURATION */
-const PORT = process.env.PORT || 3001
-mongoose.connect(process.env.MONGO_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  app.listen(PORT, () => { console.log(`listening on port: ${process.env.PORT}`); });
-})
+const PORT = process.env.PORT || 3001;
+mongoose
+  .connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`listening on port: ${process.env.PORT}`);
+    });
+  });
