@@ -2,7 +2,10 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-/**REGISTER USER */
+/**
+ * @function Register
+ * @description Method that register a new user in DB
+ */
 export const registerUser = async (req, res) => {
   try {
     const {
@@ -18,6 +21,7 @@ export const registerUser = async (req, res) => {
 
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
+
     const newUser = new User({
       firstName,
       lastName,
@@ -30,7 +34,6 @@ export const registerUser = async (req, res) => {
       viewedProfile: Math.floor(Math.random() * 10000),
       impressions: Math.floor(Math.random() * 10000),
     });
-
     const savedUser = await newUser.save();
 
     res.status(201).json(savedUser);
@@ -40,10 +43,13 @@ export const registerUser = async (req, res) => {
   }
 };
 
+/**
+ * @function Login
+ * @description Method that login a user and returns the credentials associated
+ */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email: email });
 
     if (!user) {
@@ -55,8 +61,8 @@ export const login = async (req, res) => {
       res.status(400).json({ msg: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({id: user._id}, process.env.JWT_TOKEN);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_TOKEN);
     delete user.password;
-    return res.status(200).json({ token, user})
+    return res.status(200).json({ token, user });
   } catch (error) {}
 };

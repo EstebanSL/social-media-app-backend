@@ -1,5 +1,9 @@
 import jwt from "jsonwebtoken";
 
+/**
+ * @function verifyToken
+ * @description Method that verify if a token is valid or not.
+ */
 export const verifyToken = async (req, res, next) => {
   try {
     let token = req.header('Authorization');
@@ -13,10 +17,12 @@ export const verifyToken = async (req, res, next) => {
     }
 
     const verified = jwt.verify(token, process.env.JWT_TOKEN)
-    request.user = verified
+    req.user = verified
     next()
   } catch (err) {
     console.log(err);
     res.status(500).json({msg: err.message});
   }
 }
+
+//validate an email with regex and comment each line

@@ -57,7 +57,7 @@ const upload = multer({ storage });
 
 /**routes */
 app.post('/auth/register', upload.single('picture'), registerUser);
-app.use('/posts', verifyToken, upload.single('picture'), createPost);
+app.post('/posts', verifyToken, upload.single('picture'), createPost);
 
 /**ROUTES */
 app.use('/auth', authRoutes);
@@ -76,3 +76,5 @@ mongoose
       console.log(`listening on port: ${process.env.PORT}`);
     });
   });
+
+  

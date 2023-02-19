@@ -2,12 +2,15 @@ import express from 'express';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
 
+/**
+ * @function createPost
+ * @description Method that create a new post in DB with the received data.
+ */
 export const createPost = async (req, res) => {
   try {
     const { userId, description, picturePath } = req.body;
 
-    const user = User.findById(userId);
-
+    const user = await User.findById(userId);
     const newPost = new Post({
       userId,
       firstName: user.firstName,
@@ -38,6 +41,10 @@ export const getFeedPosts = async (req, res) => {
   }
 };
 
+/**
+ * @function getUser
+ * @description Method that returns the post list for an specific user
+ */
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -48,6 +55,10 @@ export const getUserPosts = async (req, res) => {
   }
 };
 
+/**
+ * @function likePost
+ * @description Method that add/remove a like to a post
+ */
 export const likePost = async (req, res) => {
   try {
     const { id } = req.params;
@@ -65,11 +76,11 @@ export const likePost = async (req, res) => {
     const updatedPost = await Post.findByIdAndUpdate(
       id,
       { likes: post.likes },
-      { new: true1 }
+      { new: true }
     );
 
     res.status(200).json(updatedPost);
-  } catch (error) {
+  } catch (err) {
     res.status(404).json({ msg: err.message });
   }
 };

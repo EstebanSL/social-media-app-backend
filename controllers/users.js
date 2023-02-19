@@ -1,5 +1,9 @@
 import User from '../models/User.js';
 
+/**
+ * @function getUser
+ * @description Method returns a user information
+ */
 export const getUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -11,40 +15,42 @@ export const getUser = async (req, res) => {
   }
 };
 
+/**
+ * @function getUserFriends
+ * @description Method returns a the information of all friends of a user
+ */
 export const getUserFriends = async (req, res) => {
   try {
     const { id } = req.params;
-
     const user = await User.findById(id);
 
     const friends = await Promise.all(
-      user.friends.map((friendId) => {
-        User.findById(friendId);
-      })
+      user.friends.map((id) => User.findById(id))
     );
-
     const formattedFriends = friends.map(
       ({ _id, firstName, lastName, occupation, location, picturePath }) => {
         return { _id, firstName, lastName, occupation, location, picturePath };
       }
     );
-
     res.status(200).json(formattedFriends);
-  } catch (error) {
-    res.status(404).json({ msg: error.message });
+  } catch (err) {
+    res.status(404).json({ message: err.message });
   }
 };
 
+/**
+ * @function addRemoveFriends
+ * @description Method add/remove a friend from the list of friends of a user
+ */
 export const addRemoveFriends = async (req, res) => {
   try {
     const { id, friendId } = req.params;
-
     const user = await User.findById(id);
     const friend = await User.findById(friendId);
 
     if (user.friends.includes(friendId)) {
-      user.friends = user.friends.filter((userFriendId) => userFriendId !== friendId);
-      friend.friends = friend.friends.filter((friendFriendId) => friendFriendId !== id);
+      user.friends = user.friends.filter((id) => id !== friendId);
+      friend.friends = friend.friends.filter((id) => id !== id);
     } else {
       user.friends.push(friendId);
       friend.friends.push(id);
@@ -53,11 +59,8 @@ export const addRemoveFriends = async (req, res) => {
     await friend.save();
 
     const friends = await Promise.all(
-      user.friends.map((friendId) => {
-        User.findById(friendId);
-      })
+      user.friends.map((id) => User.findById(id))
     );
-
     const formattedFriends = friends.map(
       ({ _id, firstName, lastName, occupation, location, picturePath }) => {
         return { _id, firstName, lastName, occupation, location, picturePath };
@@ -65,8 +68,7 @@ export const addRemoveFriends = async (req, res) => {
     );
 
     res.status(200).json(formattedFriends);
-    
-  } catch (error) {
-    res.status(404).json({ msg: error.message });
+  } catch (err) {
+    res.status(404).json({ message: err.message });
   }
 };
